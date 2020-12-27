@@ -1,4 +1,4 @@
-const { Socket } = require('dgram');
+const { Socket, createSocket } = require('dgram');
 
 var express = require('express');
 var app = require('express')();
@@ -17,18 +17,23 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     var id = socket.id;
-    console.log(id);
+    users.set(id, 'Anon');
     socket.broadcast.emit('server message', 'user connected');
+    io.emit('nrusers', users.size);
     socket.on('disconnect', ()=> {
-        socket.broadcast.emit('server message', 'user disconnected');
+        socket.broadcast.emit('server message', users.get(id) + ' disconnected');
+        users.delete(id);
+        io.emit('nrusers', users.size);
     });
     socket.on('chat message', (msg) => {
-        io.emit('chat message' , users.get(socket.id) + ': ' + msg);
-      });
+        io.emit('chat message' , users.get(id), ': ' + msg);
+    });
     socket.on('name', (msg) => {
-        console.log(msg);
         users.set(socket.id, msg);
+        socket.emit('server message', msg + ' connected');
         console.log(users.size);
+        io.emit('nrusers', users.size);
+        console.log(users.get(id))
     });
 });
 

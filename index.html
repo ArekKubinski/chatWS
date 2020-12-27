@@ -5,8 +5,9 @@
     <link rel="stylesheet" type="text/css" href="/css/index.css">
   </head>
   <body>
+    <div><ul id="nrusers"></ul></div>
     <ul id="messages"></ul>
-    <form action="" id="name">
+    <form action="" id="form">
       <input type="text" id="m" autocomplete="off" required placeholder="Who are you?"/>
       <button>Send</button>
     </form>
@@ -16,29 +17,28 @@
   $(function () {
     var socket = io();
     var nick = "Anon";
+    var name = true;
     $('#form').submit(function(e){
       e.preventDefault(); // prevents page reloading
+      if(name) {
+      socket.emit('name', $('#m').val());
+      nick = $('#m').val();
+      $('#m').attr('placeholder', 'What you want to say?');
+      name = false;
+      } else {
       socket.emit('chat message', $('#m').val());
+      }
       $('#m').val('');
       return false;
     });
-    socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
+    socket.on('chat message', function(name, msg){
+      $('#messages').append($('<li><b>' + name + '</b>' + msg + '</li>' ));
     });
     socket.on('server message', function(msg){
       $('#messages').append($('<li id=\'serverm\'>').text(msg));
     });
-    socket.on('name' , function(msg) {
-      
-    });
-    $('#name').submit(function(e){
-      e.preventDefault(); // prevents page reloading
-      socket.emit('name', $('#m').val());
-      nick = $('#m').val();
-      document.getElementById('m').setAttribute('placeholder', 'What you want to say?')
-      document.getElementById('name').setAttribute('id', 'form')
-      $('#m').val('');
-      return false;
+    socket.on('nrusers', (msg) => {
+      $('#nrusers').append('<p>').text('Online: ' + msg);
     });
   });
 </script>
