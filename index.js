@@ -27,7 +27,6 @@ io.on('connection', (socket) => {
       });
     socket.on('name', (msg) => {
         console.log(msg);
-        io.to(id).emit('name', msg)
         users.set(socket.id, msg);
         console.log(users.size);
     });

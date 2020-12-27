@@ -6,7 +6,7 @@
   </head>
   <body>
     <ul id="messages"></ul>
-    <form action="" class="name">
+    <form action="" id="name">
       <input type="text" id="m" autocomplete="off" required placeholder="Who are you?"/>
       <button>Send</button>
     </form>
@@ -29,13 +29,14 @@
       $('#messages').append($('<li id=\'serverm\'>').text(msg));
     });
     socket.on('name' , function(msg) {
-      nick = msg;
-      document.getElementById('m').setAttribute('placeholder', 'What you want to say?')
-      document.getElementById('name').setAttribute('class', 'form')
+      
     });
     $('#name').submit(function(e){
       e.preventDefault(); // prevents page reloading
       socket.emit('name', $('#m').val());
+      nick = $('#m').val();
+      document.getElementById('m').setAttribute('placeholder', 'What you want to say?')
+      document.getElementById('name').setAttribute('id', 'form')
       $('#m').val('');
       return false;
     });
