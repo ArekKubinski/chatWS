@@ -2,13 +2,12 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    
-    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
   </head>
   <body>
     <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" />
+    <form action="" class="name">
+      <input type="text" id="m" autocomplete="off" required placeholder="Who are you?"/>
       <button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
@@ -16,7 +15,8 @@
 <script>
   $(function () {
     var socket = io();
-    $('form').submit(function(e){
+    var nick = "Anon";
+    $('#form').submit(function(e){
       e.preventDefault(); // prevents page reloading
       socket.emit('chat message', $('#m').val());
       $('#m').val('');
@@ -27,6 +27,17 @@
     });
     socket.on('server message', function(msg){
       $('#messages').append($('<li id=\'serverm\'>').text(msg));
+    });
+    socket.on('name' , function(msg) {
+      nick = msg;
+      document.getElementById('m').setAttribute('placeholder', 'What you want to say?')
+      document.getElementById('name').setAttribute('class', 'form')
+    });
+    $('#name').submit(function(e){
+      e.preventDefault(); // prevents page reloading
+      socket.emit('name', $('#m').val());
+      $('#m').val('');
+      return false;
     });
   });
 </script>
